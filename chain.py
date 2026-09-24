@@ -57,10 +57,12 @@ prompt=PromptTemplate(
 
 question="What is maximun path sum?"
 
+# Creating Function Call for joining the Retrieved Text
 def format_docs(retrieved_docs):
     context_text="\n\n".join(doc.page_content for doc in retrieved_docs)
     return context_text
 
+# Creating Parallel Chains for First retrieving relevant content and give query again as final prompt
 parallel_chain=RunnableParallel({
     "context": retriever | RunnableLambda(format_docs),
     "question": RunnablePassthrough()
@@ -68,8 +70,10 @@ parallel_chain=RunnableParallel({
 
 # print(parallel_chain.invoke(question))
 
+# Creating output parser to get proper output instead of embeddings
 parser=StrOutputParser()
 
+# Creating the Final Chain that finishes the task
 main_chain= parallel_chain | prompt | llm | parser
 
 print(main_chain.invoke(question))
